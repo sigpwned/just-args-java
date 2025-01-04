@@ -3,7 +3,7 @@
 
     <groupId>com.sigpwned</groupId>
     <artifactId>just-args</artifactId>
-    <version>0.0.0</version>
+    <version>0.0.1-SNAPSHOT</version>
     <name>just-args</name>
     <inceptionYear>2025</inceptionYear>
     <description>Minimal CLI Arguments Parser for Java 8+</description>
