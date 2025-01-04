@@ -203,7 +203,7 @@ public class JustArgsTest {
   }
 
   @Test
-  public void givenMorePositionalArgsThanMaxArgs_whenParse_thenGetSomeVarArgs() {
+  public void givenOnlyPositionalArgs_whenParse_thenGetOnlyPositionalArgs() {
     List<String> args = Arrays.asList("positional1", "positional2", "positional3");
 
     Map<Character, String> shortOptionNames = mapOf();
@@ -218,6 +218,24 @@ public class JustArgsTest {
             longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
 
     assertEquals(listOf("positional1", "positional2", "positional3"), result.getArgs());
+  }
+
+  @Test
+  public void givenSeparatorThenSwitchArgs_whenParse_thenGetPositionalArgs() {
+    List<String> args = Arrays.asList("--", "--alpha", "-bravo", "-c");
+
+    Map<Character, String> shortOptionNames = mapOf();
+    Map<String, String> longOptionNames = mapOf();
+    Map<Character, String> shortPositiveFlagNames = mapOf();
+    Map<String, String> longPositiveFlagNames = mapOf();
+    Map<Character, String> shortNegativeFlagNames = mapOf();
+    Map<String, String> longNegativeFlagNames = mapOf();
+
+    JustArgs.ParsedArgs result =
+        JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
+
+    assertEquals(listOf("--alpha", "-bravo", "-c"), result.getArgs());
   }
 
   private static <K, V> Map<K, V> mapOf() {
