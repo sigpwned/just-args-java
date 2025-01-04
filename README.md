@@ -10,6 +10,7 @@ Just Args should...
 * **Be very small**. The JAR file is currently less than 10KB compressed, under 25KB uncompressed.
 * **Be very simple**. Users only need one method to parse arguments: `JustArgs.parseArgs`.
 * **Be flexible**. Supports options, flags, and positional arguments, as well as advanced configurations.
+* **Be open source**. Released under Unlicense, so you don't have to worry about copyright.
 * **Work out of the box**. Designed to handle common argument parsing use cases with minimal configuration.
 
 ## Non-Goals
@@ -31,7 +32,7 @@ Just Args is available in Maven Central. You can add it to your project using th
 </dependency>
 ```
 
-Just Args is a single Java file with no dependencies. In a pinch, you can copy-paste it into your project.
+Just Args is a single Java file with no dependencies, so you can also just copy/paste it into your project, in a pinch.
 
 ## Quickstart
 
