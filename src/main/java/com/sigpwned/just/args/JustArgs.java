@@ -62,38 +62,28 @@ public final class JustArgs {
    */
   public static class ParsedArgs {
     private final List<String> args;
-    private final List<String> varargs;
     private final Map<String, List<String>> options;
     private final Map<String, List<Boolean>> flags;
 
     /**
      * Constructs a new ParsedArgs object.
      *
-     * @param args the positional arguments (up to maxArgs in number)
-     * @param varargs the "overflow" positional arguments (those beyond maxArgs)
+     * @param args the positional arguments
      * @param options a map from option-name to a list of string values
      * @param flags a map from flag-name to a list of boolean values
      */
-    public ParsedArgs(List<String> args, List<String> varargs, Map<String, List<String>> options,
+    public ParsedArgs(List<String> args, Map<String, List<String>> options,
         Map<String, List<Boolean>> flags) {
       this.args = unmodifiableList(args);
-      this.varargs = unmodifiableList(varargs);
       this.options = unmodifiableMapOfLists(options);
       this.flags = unmodifiableMapOfLists(flags);
     }
 
     /**
-     * Returns the list of positional arguments (up to the specified maxArgs).
+     * Returns the list of positional arguments
      */
     public List<String> getArgs() {
       return args;
-    }
-
-    /**
-     * Returns the list of overflow positional arguments (those beyond maxArgs).
-     */
-    public List<String> getVarargs() {
-      return varargs;
     }
 
     /**
@@ -114,7 +104,7 @@ public final class JustArgs {
 
     @Override
     public int hashCode() {
-      return Objects.hash(args, flags, options, varargs);
+      return Objects.hash(args, flags, options);
     }
 
     @Override
@@ -127,13 +117,12 @@ public final class JustArgs {
         return false;
       ParsedArgs other = (ParsedArgs) obj;
       return Objects.equals(args, other.args) && Objects.equals(flags, other.flags)
-          && Objects.equals(options, other.options) && Objects.equals(varargs, other.varargs);
+          && Objects.equals(options, other.options);
     }
 
     @Override
     public String toString() {
-      return "ParsedArgs [args=" + args + ", varargs=" + varargs + ", options=" + options
-          + ", flags=" + flags + "]";
+      return "ParsedArgs [args=" + args + ", options=" + options + ", flags=" + flags + "]";
     }
   }
 
@@ -187,8 +176,6 @@ public final class JustArgs {
    * positional arguments, even if they look like switches.
    *
    * @param args the command line arguments to parse, generally from the main function
-   * @param maxArgs the maximum number of positional arguments, after which positional arguments
-   *        should be collected in varargs in the result
    * @param shortOptionNames a map from valid short option names to the string to use to collect
    *        values into the options result. Keys in shortOptionNames must not appear in any other
    *        option or flag name map in character form. If a short option name does not appear in
@@ -220,19 +207,19 @@ public final class JustArgs {
    * @return the parsed arguments
    *
    * @throws NullPointerException if any argument is null
-   * @throws IllegalArgumentException if maxArgs is negative; or if any short option or flag name
-   *         appears in more than one of shortOptionNames, shortPositiveFlagNames, and
-   *         shortNegativeFlagNames; or if any long option or flag name appears in more than one of
-   *         longOptionNames, longPositiveFlagNames, and longNegativeFlagNames.
+   * @throws IllegalArgumentException if any short option or flag name appears in more than one of
+   *         shortOptionNames, shortPositiveFlagNames, and shortNegativeFlagNames; or if any long
+   *         option or flag name appears in more than one of longOptionNames, longPositiveFlagNames,
+   *         and longNegativeFlagNames.
    * @throws IllegalSyntaxException if any short switch is not an element in shortOptionNames,
    *         shortPositiveFlagNames, or shortNegativeFlagNames; or if any long switch is not an
    *         element in longOptionNames, longPositiveFlagNames, or longNegativeFlagNames; or if any
    *         option switch does not have a value; or if any flag switch has a value.
    */
-  public static ParsedArgs parseArgs(List<String> args, int maxArgs,
-      Map<Character, String> shortOptionNames, Map<String, String> longOptionNames,
-      Map<Character, String> shortPositiveFlagNames, Map<String, String> longPositiveFlagNames,
-      Map<Character, String> shortNegativeFlagNames, Map<String, String> longNegativeFlagNames) {
+  public static ParsedArgs parseArgs(List<String> args, Map<Character, String> shortOptionNames,
+      Map<String, String> longOptionNames, Map<Character, String> shortPositiveFlagNames,
+      Map<String, String> longPositiveFlagNames, Map<Character, String> shortNegativeFlagNames,
+      Map<String, String> longNegativeFlagNames) {
     if (args == null)
       throw new NullPointerException();
     if (shortOptionNames == null)
@@ -247,8 +234,6 @@ public final class JustArgs {
       throw new NullPointerException();
     if (longNegativeFlagNames == null)
       throw new NullPointerException();
-    if (maxArgs < 0)
-      throw new IllegalArgumentException("maxArgs must be non-negative");
 
     final Set<Character> duplicateShortKeys = duplicates(shortOptionNames.keySet(),
         shortPositiveFlagNames.keySet(), shortNegativeFlagNames.keySet());
@@ -262,7 +247,6 @@ public final class JustArgs {
 
     // Prepare result holders
     List<String> positionalArgs = new ArrayList<>();
-    List<String> varargs = new ArrayList<>();
     Map<String, List<String>> options = new LinkedHashMap<>();
     Map<String, List<Boolean>> flags = new LinkedHashMap<>();
 
@@ -278,24 +262,20 @@ public final class JustArgs {
     // flags.computeIfAbsent(flagName, k -> new ArrayList<>()).add(boolVal);
     // };
 
-    boolean positionalOnly = false;
+    boolean separated = false;
     final ListIterator<String> iterator = args.listIterator();
     while (iterator.hasNext()) {
       final String arg = iterator.next();
 
       // If the argument is exactly `--`, all subsequent are positional
-      if ("--".equals(arg) && positionalOnly == false) {
-        positionalOnly = true;
+      if ("--".equals(arg) && separated == false) {
+        separated = true;
         continue;
       }
 
       // If we've already encountered `--`, everything is a positional arg
-      if (positionalOnly) {
-        if (positionalArgs.size() < maxArgs) {
-          positionalArgs.add(arg);
-        } else {
-          varargs.add(arg);
-        }
+      if (separated) {
+        positionalArgs.add(arg);
         continue;
       }
 
@@ -407,15 +387,11 @@ public final class JustArgs {
         }
       } else {
         // POSITIONAL ARG
-        if (positionalArgs.size() < maxArgs) {
-          positionalArgs.add(arg);
-        } else {
-          varargs.add(arg);
-        }
+        positionalArgs.add(arg);
       }
     }
 
-    return new ParsedArgs(positionalArgs, varargs, options, flags);
+    return new ParsedArgs(positionalArgs, options, flags);
   }
 
   @SafeVarargs

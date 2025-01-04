@@ -51,7 +51,6 @@ public class JustArgsTest {
   @Test
   public void givenSimpleValidCliArgs_whenParse_thenGetExpectedResults() {
     List<String> args = Arrays.asList("--option1", "value1", "-f", "positional1");
-    int maxArgs = 1;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf("option1", "opt1");
@@ -61,11 +60,10 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     JustArgs.ParsedArgs result =
-        JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+        JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
             longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
 
     assertEquals(listOf("positional1"), result.getArgs());
-    assertEquals(listOf(), result.getVarargs());
     assertEquals(mapOf("opt1", listOf("value1")), result.getOptions());
     assertEquals(mapOf("flag1", listOf(true)), result.getFlags());
   }
@@ -73,7 +71,6 @@ public class JustArgsTest {
   @Test
   public void givenUnrecognizedSwitchInCliArgs_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("--invalidOption");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf();
@@ -83,15 +80,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenLongFlagWithAttachedValue_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("--longFlag=value");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf();
@@ -101,15 +96,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenLongOptionWithAttachedValue_whenParse_thenGetExpectedResults() {
     List<String> args = Arrays.asList("--longOption=value");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf("longOption", "longOption");
@@ -119,7 +112,7 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     JustArgs.ParsedArgs result =
-        JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+        JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
             longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
 
     assertEquals(mapOf("longOption", listOf("value")), result.getOptions());
@@ -128,7 +121,6 @@ public class JustArgsTest {
   @Test
   public void givenLongOptionAtEndOfArgs_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("--longOption");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf("longOption", "longOption");
@@ -138,15 +130,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenShortOptionAtEndOfArgs_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("-x");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf('x', "x");
     Map<String, String> longOptionNames = mapOf();
@@ -156,15 +146,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenShortOptionInMiddleOfBatch_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("-xyz");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf('y', "y");
     Map<String, String> longOptionNames = mapOf();
@@ -174,15 +162,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenShortOptionAtEndOfBatchAtEndOfArgs_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("-xzy");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf('y', "y");
     Map<String, String> longOptionNames = mapOf();
@@ -192,15 +178,13 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     assertThrows(JustArgs.IllegalSyntaxException.class,
-        () -> JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames,
-            shortPositiveFlagNames, longPositiveFlagNames, shortNegativeFlagNames,
-            longNegativeFlagNames));
+        () -> JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+            longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames));
   }
 
   @Test
   public void givenShortOptionAtEndOfBatchWithArg_whenParse_thenIllegalSyntaxException() {
     List<String> args = Arrays.asList("-xzy", "foo");
-    int maxArgs = 0;
 
     Map<Character, String> shortOptionNames = mapOf('y', "y");
     Map<String, String> longOptionNames = mapOf();
@@ -211,7 +195,7 @@ public class JustArgsTest {
 
 
     JustArgs.ParsedArgs result =
-        JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+        JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
             longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
 
     assertEquals(mapOf("x", listOf(true), "z", listOf(true)), result.getFlags());
@@ -221,7 +205,6 @@ public class JustArgsTest {
   @Test
   public void givenMorePositionalArgsThanMaxArgs_whenParse_thenGetSomeVarArgs() {
     List<String> args = Arrays.asList("positional1", "positional2", "positional3");
-    int maxArgs = 2;
 
     Map<Character, String> shortOptionNames = mapOf();
     Map<String, String> longOptionNames = mapOf();
@@ -231,11 +214,10 @@ public class JustArgsTest {
     Map<String, String> longNegativeFlagNames = mapOf();
 
     JustArgs.ParsedArgs result =
-        JustArgs.parseArgs(args, maxArgs, shortOptionNames, longOptionNames, shortPositiveFlagNames,
+        JustArgs.parseArgs(args, shortOptionNames, longOptionNames, shortPositiveFlagNames,
             longPositiveFlagNames, shortNegativeFlagNames, longNegativeFlagNames);
 
-    assertEquals(listOf("positional1", "positional2"), result.getArgs());
-    assertEquals(listOf("positional3"), result.getVarargs());
+    assertEquals(listOf("positional1", "positional2", "positional3"), result.getArgs());
   }
 
   private static <K, V> Map<K, V> mapOf() {
@@ -253,6 +235,7 @@ public class JustArgsTest {
     return unmodifiableMap(result);
   }
 
+  @SuppressWarnings("unused")
   private static <T> List<T> listOf() {
     return emptyList();
   }
