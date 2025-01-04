@@ -43,7 +43,6 @@ To parse a list of command-line arguments:
 import com.sigpwned.just.args.JustArgs;
 
 List<String> args = List.of("--xray", "value1", "-f", "positional1");
-int maxArgs = 1;
 
 Map<Character, String> shortOptionNames = Map.of('x', "xray");
 Map<String, String> longOptionNames = Map.of("xray", "xray");
@@ -53,10 +52,10 @@ Map<Character, String> shortNegativeFlagNames = Map.of();
 Map<String, String> longNegativeFlagNames = Map.of();
 
 JustArgs.ParsedArgs result = JustArgs.parseArgs(
-    args, maxArgs, shortOptionNames, longOptionNames, 
+    args,
+    shortOptionNames, longOptionNames, 
     shortPositiveFlagNames, longPositiveFlagNames, 
-    shortNegativeFlagNames, longNegativeFlagNames
-);
+    shortNegativeFlagNames, longNegativeFlagNames);
 
 System.out.println(result.getArgs()); // [positional1]
 System.out.println(result.getOptions()); // {xray=[value1]}
